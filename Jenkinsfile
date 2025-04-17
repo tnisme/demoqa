@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Clone') {
             steps {
-                git credentialsId: 'nghiabui', url: 'https://github.com/tnisme/demoqa.git'
+                git branch: 'main', url: 'https://github.com/tnisme/demoqa.git'
             }
         }
 
