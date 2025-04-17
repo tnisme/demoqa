@@ -5,10 +5,14 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '10'))
     }
 
+    tools {
+            maven 'maven'
+    }
+
     stages {
         stage('Clone') {
             steps {
-                git branch: 'main', url: 'https://github.com/tnisme/demoqa.git'
+                checkout scm
             }
         }
 
