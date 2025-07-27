@@ -1,6 +1,7 @@
 package base;
 
 import com.relevantcodes.extentreports.LogStatus;
+import demoqa.enums.BrowserType;
 import demoqa.page.method.DashboardPage;
 import demoqa.utility.DataTest;
 import demoqa.utility.ReportUtility;
@@ -11,7 +12,9 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.*;
@@ -19,6 +22,8 @@ import org.testng.annotations.*;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
@@ -32,23 +37,21 @@ public class BaseTest {
         return driver.get();
     }
 
-    @BeforeSuite
-    public void setSuite() {
-        String suiteName = org.testng.Reporter.getCurrentTestResult().getTestContext().getSuite().getXmlSuite().getName();
-        ReportUtility.init(suiteName);
-    }
-
     @BeforeTest
-    public void setUp(ITestContext ctx) {
-        ReportUtility.init(ctx.getCurrentXmlTest().getSuite().getName());
+    @Parameters("browser")
+    public void setUp(ITestContext ctx, @Optional("CHROME") BrowserType browser) {
+        cleanReportDirectory();
+        ReportUtility.init(ctx.getCurrentXmlTest().getName());
+        className.set(getClass().getSimpleName());
+        ReportUtility.getInstance().startTest(className.get());
+        ReportUtility.getInstance().log(LogStatus.INFO, "<b>Browser: " + browser + "<b>");
+
         DataTest.init();
-        initBrowser();
+        initBrowser(browser);
     }
 
     @BeforeClass
     public void beforeClass() {
-        className.set(getClass().getSimpleName());
-        ReportUtility.getInstance().startTest(className.get());
         preCondition();
     }
 
@@ -83,28 +86,43 @@ public class BaseTest {
         }
     }
 
-    private void initBrowser() {
+    private void initBrowser(BrowserType browser) {
         WaitUtility waitU;
         WebDriver localDriver;
+        JSONObject jsonObject = null;
         File file = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "data" + File.separator + "environment.json");
         try {
             String content = FileUtils.readFileToString(file, "utf-8");
-            JSONObject jsonObject = new JSONObject(content);
-
-            localDriver = new ChromeDriver();
-            driver.set(localDriver);
-            getDriver().manage().window().maximize();
-            getDriver().manage().timeouts().implicitlyWait(jsonObject.getInt("object_wait"), TimeUnit.SECONDS);
-
-            waitU = new WaitUtility(getDriver());
-            getDriver().get(DataTest.getHomeURL());
-            waitU.waitForPageLoad();
+            jsonObject = new JSONObject(content);
         } catch (IOException e) {
             ReportUtility.getInstance().log(LogStatus.ERROR, e.toString());
             ReportUtility.getInstance().log(LogStatus.ERROR, e.getMessage());
             e.printStackTrace();
         }
+        try {
+            switch (browser) {
+                case CHROME:
+                    localDriver = new RemoteWebDriver(new URL(jsonObject.getString("hub_url")), new ChromeOptions());
+                    break;
+                case FIREFOX:
+                    localDriver = new RemoteWebDriver(new URL(jsonObject.getString("hub_url")), new FirefoxOptions());
+                    break;
+                case EDGE:
+                default:
+                    throw new IllegalArgumentException("Browser type not supported");
+            }
+            driver.set(localDriver);
+        } catch (MalformedURLException e) {
+            ReportUtility.getInstance().log(LogStatus.ERROR, e.toString());
+            ReportUtility.getInstance().log(LogStatus.ERROR, e.getMessage());
+            e.printStackTrace();
+        }
 
+        getDriver().manage().window().maximize();
+        getDriver().manage().timeouts().implicitlyWait(jsonObject.getInt("object_wait"), TimeUnit.SECONDS);
+        waitU = new WaitUtility(getDriver());
+        getDriver().get(DataTest.getHomeURL());
+        waitU.waitForPageLoad();
     }
 
     protected void preCondition() {
@@ -122,5 +140,18 @@ public class BaseTest {
         File srcFile = ((TakesScreenshot) getDriver()).getScreenshotAs(OutputType.FILE);
         FileUtils.copyFile(srcFile, new File(screenshotPath));
         ReportUtility.getInstance().addScreenCapture(LogStatus.FAIL, screenshotPath);
+    }
+
+    private void cleanReportDirectory() {
+        // Clean report directory before running tests
+        try {
+            File reportDir = new File(USER_DIR + File.separator + "test-output" + File.separator +"report");
+            if (reportDir.exists()) {
+                FileUtils.cleanDirectory(reportDir);
+                System.out.println("Cleaned report directory: " + reportDir.getAbsolutePath());
+            }
+        } catch (IOException e) {
+            System.err.println("Failed to clean report directory: " + e.getMessage());
+        }
     }
 }

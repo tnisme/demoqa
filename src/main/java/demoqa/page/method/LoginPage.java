@@ -10,26 +10,28 @@ public class LoginPage extends LoginLocator {
         super(driver);
     }
 
-    public void fillInUsername(String username) {
+    public LoginPage fillInUsername(String username) {
         weUsername.clear();
         weUsername.sendKeys(username);
+        return this;
     }
 
-    public void fillInPassword(String password) {
+    public LoginPage fillInPassword(String password) {
         wePassword.clear();
         wePassword.sendKeys(password);
+        return this;
     }
 
-    public void clickLogin() {
+    public LoginPage clickLogin() {
         getWaitUtility().waitUntilToBeClickAble(weLogin);
         getActionUtility().scrollToElement(weLogin);
         weLogin.click();
+        return this;
     }
 
-    public void performLogin(String username, String password) {
-        fillInUsername(username);
-        fillInPassword(password);
-        clickLogin();
+    public LoginPage performLogin(String username, String password) {
+        fillInUsername(username).fillInPassword(password).clickLogin();
+        return this;
     }
 
     public ProfilePage login(String username, String password) {

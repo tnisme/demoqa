@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
-<suite name="demoqa">
-    <test name="run">
+<suite name="demoqa" parallel="tests" thread-count="2">
+    <test name="run on chrome">
+        <parameter name="browser" value="CHROME"/>
+        <classes>
+            <class name="function.LoginTest"/>
+        </classes>
+    </test> <!-- Test -->
+
+    <test name="run on firefox">
+        <parameter name="browser" value="FIREFOX"/>
         <classes>
             <class name="function.LoginTest"/>
         </classes>

@@ -10,6 +10,7 @@ public class DashboardPage extends DashboardLocator {
 
     public BookStoreApplicationPage goToBookStoreApplication() {
         getWaitUtility().waitUntilToBeClickAble(weBookStoreApplication);
+        getActionUtility().scrollToElement(weBookStoreApplication);
         weBookStoreApplication.click();
         getWaitUtility().waitForPageLoad();
         return new BookStoreApplicationPage(driver);

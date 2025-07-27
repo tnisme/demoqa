@@ -1,4 +1,5 @@
 {
   "homeUrl": "https://demoqa.com/",
-  "object_wait": 3
+  "object_wait": 3,
+  "hub_url": "http://localhost:4444/wd/hub"
 }
