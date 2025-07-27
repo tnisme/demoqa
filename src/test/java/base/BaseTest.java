@@ -2,7 +2,7 @@ package base;
 
 import com.relevantcodes.extentreports.LogStatus;
 import demoqa.enums.BrowserType;
-import demoqa.page.method.DashboardPage;
+import demoqa.page.DashboardPage;
 import demoqa.utility.DataTest;
 import demoqa.utility.ReportUtility;
 import demoqa.utility.WaitUtility;
