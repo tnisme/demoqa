@@ -32,7 +32,7 @@ pipeline {
                     keepAll               : true,
                     useWrapperFileDirectly: true,
                     reportDir             : 'test-output/report',
-                    reportFiles           : 'demoqa.html',
+                    reportFiles           : 'chrome.html', 'firefox.html',
                     reportName            : 'HTML Report',
                     reportTitles          : 'demo_qa'
                 ])
