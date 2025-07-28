@@ -34,7 +34,7 @@ pipeline {
                     reportDir             : 'test-output/report',
                     reportFiles           : 'chrome.html, firefox.html',
                     reportName            : 'HTML Report',
-                    reportTitles          : 'demo_qa'
+                    reportTitles          : 'chrome, firefox'
                 ])
 
                 testNG(
