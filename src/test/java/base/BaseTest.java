@@ -136,10 +136,11 @@ public class BaseTest {
     private void captureScreenshot(String methodName) throws IOException {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         String fileName = methodName + "_" + timestamp + ".png";
-        String screenshotPath = "screenshots" + File.separator + fileName;
+        String relativePath = "screenshots" + File.separator + fileName;
+        String screenshotPath = USER_DIR + File.separator + "test-output" + File.separator + "report" + File.separator + relativePath;
         File srcFile = ((TakesScreenshot) getDriver()).getScreenshotAs(OutputType.FILE);
         FileUtils.copyFile(srcFile, new File(screenshotPath));
-        ReportUtility.getInstance().addScreenCapture(LogStatus.FAIL, screenshotPath);
+        ReportUtility.getInstance().addScreenCapture(LogStatus.FAIL, relativePath);
     }
 
     private void cleanReportDirectory() {
