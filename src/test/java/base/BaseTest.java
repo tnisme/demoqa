@@ -2,14 +2,10 @@ package base;
 
 import com.relevantcodes.extentreports.LogStatus;
 import demoqa.enums.BrowserType;
-import demoqa.page.DashboardPage;
-import demoqa.utility.DataTest;
+import demoqa.factories.*;
 import demoqa.utility.ReportUtility;
-import demoqa.utility.WaitUtility;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -24,30 +20,24 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.concurrent.TimeUnit;
+import java.nio.file.Paths;
 
 public class BaseTest {
     private static final ThreadLocal<String> className = new ThreadLocal<>();
-    public static ThreadLocal<WebDriver> driver = new ThreadLocal<>();
     private final static String USER_DIR = System.getProperty("user.dir");
-
-    public synchronized static WebDriver getDriver() {
-        return driver.get();
-    }
+    private static final String CONFIG_PATH = Paths.get("src", "main", "resources", "data").toString();
 
     @BeforeTest
     @Parameters("browser")
     public void setUp(ITestContext ctx, @Optional("CHROME") BrowserType browser) {
         cleanReportDirectory();
-        ReportUtility.init(ctx.getCurrentXmlTest().getName());
         className.set(getClass().getSimpleName());
-        ReportUtility.getInstance().startTest(className.get());
-        ReportUtility.getInstance().log(LogStatus.INFO, "<b>Browser: " + browser + "<b>");
+        UtilityFactory.initReport(ctx.getCurrentXmlTest().getName());
+        UtilityFactory.reportUtil().startTest(className.get());
+        UtilityFactory.reportUtil().log(LogStatus.INFO, "<b>Browser: " + browser + "<b>");
 
-        DataTest.init();
         initBrowser(browser);
+        PageFactory.init(DriverManager.getDriver());
     }
 
     @BeforeClass
@@ -57,46 +47,70 @@ public class BaseTest {
 
     @BeforeMethod
     public void setUpBeforeMethod(Method method) {
-        ReportUtility.getInstance().log(LogStatus.INFO, "<b>Start method: " + method.getName() + "</b>");
+        UtilityFactory.reportUtil().log(LogStatus.INFO, "<b>Start method: " + method.getName() + "</b>");
     }
 
     @AfterMethod
     public void afterMethod(ITestResult result, Method method) throws IOException {
         String methodName = method.getName();
         if (result.getStatus() == ITestResult.FAILURE) {
-            ReportUtility.getInstance().log(LogStatus.FAIL, "Test case: " + methodName + " failed");
-            ReportUtility.getInstance().log(LogStatus.FAIL, result.getThrowable().toString());
-            captureScreenshot(methodName);
+            UtilityFactory.reportUtil().log(LogStatus.FAIL, "Test case: " + methodName + " failed");
+            UtilityFactory.reportUtil().addScreenCapture(LogStatus.FAIL);
         } else if (result.getStatus() == ITestResult.SKIP) {
-            ReportUtility.getInstance().log(LogStatus.SKIP, "Test case: " + methodName + " skipped");
+            UtilityFactory.reportUtil().log(LogStatus.SKIP, "Test case: " + methodName + " skipped");
         } else {
-            ReportUtility.getInstance().log(LogStatus.PASS, "Test case: " + methodName + " passed");
+            UtilityFactory.reportUtil().log(LogStatus.PASS, "Test case: " + methodName + " passed");
         }
     }
 
     @AfterClass
     public void afterClass() throws TimeoutException {
-        ReportUtility.getInstance().flush();
+        UtilityFactory.reportUtil().flush();
     }
 
     @AfterTest
     public void tearDown() {
-        if (getDriver() != null) {
-            getDriver().quit();
+        if (DriverManager.getDriver() == null) {
+            return;
+        }
+
+        try {
+            // Clear utility
+            UtilityFactory.clear();
+
+            // Clear report
+            ReportUtility report = UtilityFactory.reportUtil();
+            if (report != null) {
+               report.close();
+            }
+
+            // Clear page & element factories
+            PageFactory.clear();
+            ElementFactory.clear();
+
+            // Quit driver
+            try {
+                DriverManager.getDriver().quit();
+            } catch (Exception e) {
+                UtilityFactory.reportUtil().log(LogStatus.ERROR, e.toString());
+                e.printStackTrace();
+            }
+        } finally {
+            // Always remove driver to avoid memory leaks
+            DriverManager.removeDriver();
         }
     }
 
     private void initBrowser(BrowserType browser) {
-        WaitUtility waitU;
         WebDriver localDriver;
         JSONObject jsonObject = null;
-        File file = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "data" + File.separator + "environment.json");
+        File file = new File(CONFIG_PATH + File.separator + "environment.json");
         try {
             String content = FileUtils.readFileToString(file, "utf-8");
             jsonObject = new JSONObject(content);
         } catch (IOException e) {
-            ReportUtility.getInstance().log(LogStatus.ERROR, e.toString());
-            ReportUtility.getInstance().log(LogStatus.ERROR, e.getMessage());
+            UtilityFactory.reportUtil().log(LogStatus.ERROR, e.toString());
+            UtilityFactory.reportUtil().log(LogStatus.ERROR, e.getMessage());
             e.printStackTrace();
         }
         try {
@@ -111,36 +125,20 @@ public class BaseTest {
                 default:
                     throw new IllegalArgumentException("Browser type not supported");
             }
-            driver.set(localDriver);
+            DriverManager.setDriver(localDriver);
         } catch (MalformedURLException e) {
-            ReportUtility.getInstance().log(LogStatus.ERROR, e.toString());
-            ReportUtility.getInstance().log(LogStatus.ERROR, e.getMessage());
-            e.printStackTrace();
+            UtilityFactory.reportUtil().log(LogStatus.ERROR, e.toString());
+            UtilityFactory.reportUtil().log(LogStatus.ERROR, e.getMessage());
+            throw new RuntimeException("Failed to initialize browser: " + e.getMessage(), e);
         }
 
-        getDriver().manage().window().maximize();
-        getDriver().manage().timeouts().implicitlyWait(jsonObject.getInt("object_wait"), TimeUnit.SECONDS);
-        waitU = new WaitUtility(getDriver());
-        getDriver().get(DataTest.getHomeURL());
-        waitU.waitForPageLoad();
+        DriverManager.getDriver().manage().window().maximize();
+        DriverManager.getDriver().get(DataFactory.getHomeURL());
+        UtilityFactory.waitUtil().waitForPageLoad();
     }
 
     protected void preCondition() {
         // Implement pre-condition
-    }
-
-    protected DashboardPage getDashboardPage() {
-        return new DashboardPage(getDriver());
-    }
-
-    private void captureScreenshot(String methodName) throws IOException {
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-        String fileName = methodName + "_" + timestamp + ".png";
-        String relativePath = "screenshots" + File.separator + fileName;
-        String screenshotPath = USER_DIR + File.separator + "test-output" + File.separator + "report" + File.separator + relativePath;
-        File srcFile = ((TakesScreenshot) getDriver()).getScreenshotAs(OutputType.FILE);
-        FileUtils.copyFile(srcFile, new File(screenshotPath));
-        ReportUtility.getInstance().addScreenCapture(LogStatus.FAIL, relativePath);
     }
 
     private void cleanReportDirectory() {

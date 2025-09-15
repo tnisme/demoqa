@@ -69,7 +69,7 @@ public class WaitUtility {
     }
 
     public void waitForPageLoad(int timeout) throws JavascriptException {
-        new WebDriverWait(driver, Duration.ofSeconds(TIMEOUT_INTERVAL_UNIT)).until((ExpectedCondition<Boolean>) d -> js
+        new WebDriverWait(driver, Duration.ofSeconds(timeout)).until((ExpectedCondition<Boolean>) d -> js
                 .executeScript("return document.readyState").toString().equals("complete"));
     }
 
@@ -86,6 +86,15 @@ public class WaitUtility {
 
     public WebElement waitUntilVisibilityOf(WebElement element, int timeOutSecond) {
         return new WebDriverWait(driver, Duration.ofSeconds(timeOutSecond)).until(ExpectedConditions.visibilityOf(element));
+    }
+
+    public WebElement waitUntilVisibilityOf(By by) throws TimeoutException {
+        return waitUntilVisibilityOf(by, TIMEOUT_INTERVAL_UNIT);
+    }
+
+    public WebElement waitUntilVisibilityOf(By by, int timeoutSecond) throws TimeoutException {
+        return new WebDriverWait(driver, Duration.ofSeconds(timeoutSecond))
+                .until(ExpectedConditions.visibilityOfElementLocated(by));
     }
 
     public void sleep(long time) {

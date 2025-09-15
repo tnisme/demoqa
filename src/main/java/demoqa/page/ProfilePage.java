@@ -1,10 +1,10 @@
 package demoqa.page;
 
+import demoqa.factories.ElementFactory;
+import demoqa.factories.PageFactory;
+import demoqa.factories.UtilityFactory;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.How;
-import demoqa.utility.AssertUtility;
 
 public class ProfilePage extends BasePage {
 
@@ -13,22 +13,19 @@ public class ProfilePage extends BasePage {
     }
 
     // region locators
-    @FindBy(how = How.ID, using = "userName-value")
-    private WebElement weUserName;
-    @FindBy(how = How.XPATH, using = "//button[text()='Log out']")
-    private WebElement weLogout;
+    private By username = By.id("userName-value");
+    private By logout = By.xpath("//button[text()='Log out']");
     // endregion
 
     // region methods
-    public ProfilePage checkUsername(String username) {
-        AssertUtility.assertEquals(username, weUserName.getText(),"Check username");
+    public ProfilePage checkUsername(String usernameExpected) {
+        UtilityFactory.assertUtil().assertEquals(usernameExpected, ElementFactory.label(username).getText(),"Check username");
         return this;
     }
 
     public LoginPage logout() {
-        getWaitUtility().waitUntilToBeClickAble(weLogout);
-        weLogout.click();
-        return new LoginPage(driver);
+        ElementFactory.button(logout).clickButton();
+        return PageFactory.loginPage();
     }
     // endregion
 }

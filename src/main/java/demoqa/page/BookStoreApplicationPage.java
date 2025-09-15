@@ -1,9 +1,9 @@
 package demoqa.page;
 
+import demoqa.factories.ElementFactory;
+import demoqa.factories.PageFactory;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.How;
 
 public class BookStoreApplicationPage extends BasePage {
 
@@ -12,15 +12,13 @@ public class BookStoreApplicationPage extends BasePage {
     }
 
     // region locators
-    @FindBy(how = How.XPATH, using = "//span[text()='Login']/ancestor::li")
-    protected WebElement weLogin;
+    private final By login = By.xpath("//span[text()='Login']/ancestor::li");
     // endregion
 
     // region methods
     public LoginPage goToLoginPage() {
-        getWaitUtility().waitUntilToBeClickAble(weLogin);
-        weLogin.click();
-        return new LoginPage(driver);
+        ElementFactory.button(login).clickButton();
+        return PageFactory.loginPage();
     }
     // endregion
 }

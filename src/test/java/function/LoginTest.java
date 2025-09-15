@@ -1,38 +1,38 @@
 package function;
 
 import base.BaseTest;
+import com.relevantcodes.extentreports.LogStatus;
 import demoqa.entity.Account;
-import demoqa.page.BookStoreApplicationPage;
-import demoqa.page.LoginPage;
-import demoqa.page.ProfilePage;
-import demoqa.utility.DataTest;
+import demoqa.factories.DataFactory;
+import demoqa.factories.PageFactory;
+import demoqa.factories.UtilityFactory;
 import org.testng.annotations.Test;
 
 public class LoginTest extends BaseTest {
 
     private Account account, randomAccount;
-    private LoginPage loginPage;
-    private BookStoreApplicationPage bookStoreApplicationPage;
-    private ProfilePage profilePage;
 
     @Override
     public void preCondition() {
-        account = DataTest.getAdminAccount();
-        randomAccount = DataTest.getRandomAccount();
+        account = DataFactory.getAdminAccount();
+        UtilityFactory.reportUtil().log(LogStatus.INFO, "Test valid data: " + account);
+        randomAccount = DataFactory.getRandomAccount();
+        UtilityFactory.reportUtil().log(LogStatus.INFO, "Test invalid data: " + randomAccount);
     }
 
     @Test
     public void loginWithValidAccount() {
-        bookStoreApplicationPage = getDashboardPage().goToBookStoreApplication();
-        loginPage = bookStoreApplicationPage.goToLoginPage();
-        profilePage = loginPage.login(account.getUsername(), account.getPassword())
+        PageFactory.dashboardPage()
+                .goToBookStoreApplication()
+                .goToLoginPage()
+                .login(account.getUsername(), account.getPassword())
                 .checkUsername(account.getUsername());
     }
 
     @Test(dependsOnMethods = "loginWithValidAccount")
     public void loginValidAccountTest() {
-        loginPage = profilePage.logout();
-        loginPage.performLogin(randomAccount.getUsername(), randomAccount.getPassword())
+        PageFactory.profilePage().logout()
+                .performLogin(randomAccount.getUsername(), randomAccount.getPassword())
                 .checkErrorMsgDisplayed();
     }
 }

@@ -1,11 +1,10 @@
 package demoqa.page;
 
-import demoqa.utility.AssertUtility;
-import org.openqa.selenium.TimeoutException;
+import demoqa.factories.ElementFactory;
+import demoqa.factories.PageFactory;
+import demoqa.factories.UtilityFactory;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.How;
 
 public class LoginPage extends BasePage {
 
@@ -14,58 +13,86 @@ public class LoginPage extends BasePage {
     }
 
     // region locators
-    @FindBy(how = How.ID, using = "userName")
-    private WebElement weUsername;
-    @FindBy(how = How.ID, using = "password")
-    private WebElement wePassword;
-    @FindBy(how = How.ID, using = "login")
-    private WebElement weLogin;
-    @FindBy(how = How.XPATH, using = "//p[text()='Invalid username or password!']")
-    private WebElement weErrorMsg;
+    private By usernameField = By.id("userName");
+    private By passwordField = By.id("password");
+    private By loginButton = By.id("login");
+    private By errorMsg = By.xpath("//p[text()='Invalid username or password!']");
     // endregion
 
     // region methods
+    /**
+     * Fills in the username field
+     *
+     * @param username the username
+     * @return the LoginPage object
+     */
     public LoginPage fillInUsername(String username) {
-        weUsername.clear();
-        weUsername.sendKeys(username);
+        ElementFactory.input(usernameField).clearBefore().type(username).perform();
         return this;
     }
 
+    /**
+     * Fills in the password field
+     *
+     * @param password the password
+     * @return the LoginPage object
+     */
     public LoginPage fillInPassword(String password) {
-        wePassword.clear();
-        wePassword.sendKeys(password);
+        ElementFactory.input(passwordField).clearBefore().type(password).perform();
         return this;
     }
 
+    /**
+     * Clicks the login button
+     *
+     * @return the LoginPage object
+     */
     public LoginPage clickLogin() {
-        getWaitUtility().waitUntilToBeClickAble(weLogin);
-        getActionUtility().scrollToElement(weLogin);
-        weLogin.click();
+        ElementFactory.button(loginButton).clickButton();
         return this;
     }
 
+    /**
+     * Performs the login action
+     *
+     * @param username the username
+     * @param password the password
+     * @return the LoginPage object
+     */
     public LoginPage performLogin(String username, String password) {
         fillInUsername(username).fillInPassword(password).clickLogin();
         return this;
     }
 
+    /**
+     * Logs in and navigates to the ProfilePage
+     *
+     * @param username the username
+     * @param password the password
+     * @return the ProfilePage object
+     */
     public ProfilePage login(String username, String password) {
         performLogin(username, password);
-        return new ProfilePage(driver);
+        return PageFactory.profilePage();
     }
 
+    /**
+     * Checks if the error message is displayed
+     *
+     * @return the LoginPage object
+     */
     public LoginPage checkErrorMsgDisplayed() {
-        AssertUtility.assertTrue(isErrorMsgDisplayed(), "Check error message");
+        UtilityFactory.assertUtil().assertTrue(isErrorMsgDisplayed(), "Check error message");
         return this;
     }
 
+    /**
+     * Checks if the error message is displayed
+     *
+     * @return true if the error message is displayed, false otherwise
+     */
     private boolean isErrorMsgDisplayed() {
-        try {
-            getWaitUtility().waitUntilVisibilityOf(weErrorMsg, 5);
-            return true;
-        } catch (TimeoutException e) {
-            return false;
-        }
+        return ElementFactory.label(errorMsg).isDisplayed(5);
     }
     // endregion
 }
