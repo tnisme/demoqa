@@ -37,7 +37,6 @@ public class BaseTest {
         UtilityFactory.reportUtil().log(LogStatus.INFO, "<b>Browser: " + browser + "<b>");
 
         initBrowser(browser);
-        PageFactory.init(DriverManager.getDriver());
     }
 
     @BeforeClass
@@ -83,10 +82,6 @@ public class BaseTest {
             if (report != null) {
                report.close();
             }
-
-            // Clear page & element factories
-            PageFactory.clear();
-            ElementFactory.clear();
 
             // Quit driver
             try {

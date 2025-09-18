@@ -13,6 +13,11 @@ public class JsonUtility {
         // private constructor to prevent instantiation
     }
 
+    /**
+     * Reads a JSON file from the classpath and returns it as a JSONObject.
+     * @param path
+     * @return
+     */
     public static JSONObject readJson(String path) {
         try (InputStream is = JsonUtility.class.getClassLoader().getResourceAsStream(path)) {
             if (is == null) {

@@ -4,13 +4,8 @@ import demoqa.factories.ElementFactory;
 import demoqa.factories.PageFactory;
 import demoqa.factories.UtilityFactory;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 
 public class LoginPage extends BasePage {
-
-    public LoginPage(WebDriver driver) {
-        super(driver);
-    }
 
     // region locators
     private By usernameField = By.id("userName");

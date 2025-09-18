@@ -4,13 +4,8 @@ import demoqa.factories.ElementFactory;
 import demoqa.factories.PageFactory;
 import demoqa.factories.UtilityFactory;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 
 public class ProfilePage extends BasePage {
-
-    public ProfilePage(WebDriver driver) {
-        super(driver);
-    }
 
     // region locators
     private By username = By.id("userName-value");

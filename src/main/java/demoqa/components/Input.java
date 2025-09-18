@@ -4,7 +4,6 @@ import com.relevantcodes.extentreports.LogStatus;
 import demoqa.factories.UtilityFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 public class Input extends BaseElement {
@@ -12,8 +11,8 @@ public class Input extends BaseElement {
     private boolean shouldClear = false;
     private final StringBuilder textBuilder = new StringBuilder();
 
-    public Input(WebDriver driver, By locator) {
-        super(driver, locator);
+    public Input(By locator) {
+        super(locator);
     }
 
     public Input clearBefore() {

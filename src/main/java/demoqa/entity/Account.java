@@ -1,6 +1,9 @@
 package demoqa.entity;
 
-
+/**
+ * Represents a user account with authentication credentials.
+ * This class follows the builder pattern for object creation.
+ */
 public class Account {
     private String username;
     private String password;

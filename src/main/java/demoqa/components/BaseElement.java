@@ -2,15 +2,19 @@ package demoqa.components;
 
 import demoqa.factories.UtilityFactory;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+/**
+ * Abstract base class for all web elements in the framework.
+ * Provides common functionality and locator-based element interaction.
+ */
 public abstract class BaseElement {
-    protected WebDriver driver;
+    /**
+     * The locator strategy used to find this element
+     */
     protected By locator;
 
-    protected BaseElement(WebDriver driver, By locator) {
-        this.driver = driver;
+    protected BaseElement(By locator) {
         this.locator = locator;
     }
 
