@@ -3,7 +3,7 @@ package base;
 import com.relevantcodes.extentreports.LogStatus;
 import demoqa.enums.BrowserType;
 import demoqa.factories.*;
-import demoqa.utility.ReportUtility;
+import demoqa.utilities.ReportUtility;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 import org.openqa.selenium.TimeoutException;
@@ -126,10 +126,7 @@ public class BaseTest {
             UtilityFactory.reportUtil().log(LogStatus.ERROR, e.getMessage());
             throw new RuntimeException("Failed to initialize browser: " + e.getMessage(), e);
         }
-
         DriverManager.getDriver().manage().window().maximize();
-        DriverManager.getDriver().get(DataFactory.getHomeURL());
-        UtilityFactory.waitUtil().waitForPageLoad();
     }
 
     protected void preCondition() {

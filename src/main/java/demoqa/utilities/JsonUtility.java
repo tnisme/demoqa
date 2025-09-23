@@ -1,4 +1,4 @@
-package demoqa.utility;
+package demoqa.utilities;
 
 import org.json.JSONObject;
 

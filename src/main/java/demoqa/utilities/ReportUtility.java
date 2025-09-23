@@ -1,4 +1,4 @@
-package demoqa.utility;
+package demoqa.utilities;
 
 import com.relevantcodes.extentreports.ExtentReports;
 import com.relevantcodes.extentreports.ExtentTest;
@@ -87,6 +87,7 @@ public class ReportUtility {
         } catch (Exception e) {
             log(LogStatus.ERROR, "Failed to capture screenshot: " + e.getMessage());
         }
+        logger.log(LogStatus.INFO, "URL: " + DriverManager.getDriver().getCurrentUrl());
         logger.log(status, logger.addScreenCapture(screenshotPath));
     }
 

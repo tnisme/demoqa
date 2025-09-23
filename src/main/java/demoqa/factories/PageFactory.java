@@ -1,9 +1,9 @@
 package demoqa.factories;
 
-import demoqa.page.BookStoreApplicationPage;
-import demoqa.page.DashboardPage;
-import demoqa.page.LoginPage;
-import demoqa.page.ProfilePage;
+import demoqa.pages.BookStoreApplicationPage;
+import demoqa.pages.DashboardPage;
+import demoqa.pages.LoginPage;
+import demoqa.pages.ProfilePage;
 
 public class PageFactory {
 

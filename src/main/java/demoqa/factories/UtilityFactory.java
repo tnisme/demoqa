@@ -1,9 +1,10 @@
 package demoqa.factories;
 
-import demoqa.utility.ActionUtility;
-import demoqa.utility.AssertUtility;
-import demoqa.utility.ReportUtility;
-import demoqa.utility.WaitUtility;
+import com.relevantcodes.extentreports.LogStatus;
+import demoqa.utilities.ActionUtility;
+import demoqa.utilities.AssertUtility;
+import demoqa.utilities.ReportUtility;
+import demoqa.utilities.WaitUtility;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -89,8 +90,10 @@ public class UtilityFactory {
     public static void clear() {
         Map<Class<?>, Object> map = UTILITIES.get();
         map.values().forEach(o -> {
-            if (o instanceof AutoCloseable) {
-                try { ((AutoCloseable)o).close(); } catch (Exception ignored) {}
+            if (o instanceof AutoCloseable ac) {
+                try { ac.close(); } catch (Exception ignored) {
+                    reportUtil().log(LogStatus.WARNING, ignored.toString());
+                }
             }
         });
         UTILITIES.remove();

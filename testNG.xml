@@ -2,6 +2,11 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
 <suite name="demoqa" parallel="tests" thread-count="2">
+
+    <listeners>
+        <listener class-name="demoqa.listeners.RetryListener"/>
+    </listeners>
+
     <test name="chrome">
         <parameter name="browser" value="CHROME"/>
         <classes>

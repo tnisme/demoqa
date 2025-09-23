@@ -1,4 +1,4 @@
-package demoqa.utility;
+package demoqa.utilities;
 
 import com.relevantcodes.extentreports.LogStatus;
 import demoqa.factories.UtilityFactory;

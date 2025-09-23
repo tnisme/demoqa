@@ -2,7 +2,7 @@ package function;
 
 import base.BaseTest;
 import com.relevantcodes.extentreports.LogStatus;
-import demoqa.entity.Account;
+import demoqa.entities.Account;
 import demoqa.factories.DataFactory;
 import demoqa.factories.PageFactory;
 import demoqa.factories.UtilityFactory;
@@ -23,15 +23,20 @@ public class LoginTest extends BaseTest {
     @Test
     public void loginWithValidAccount() {
         PageFactory.dashboardPage()
+                .open()
                 .goToBookStoreApplication()
                 .goToLoginPage()
                 .login(account.getUsername(), account.getPassword())
-                .checkUsername(account.getUsername());
+                .checkUsername(account.getUsername())
+                .logout();
     }
 
-    @Test(dependsOnMethods = "loginWithValidAccount")
-    public void loginValidAccountTest() {
-        PageFactory.profilePage().logout()
+    @Test
+    public void loginInvalidAccount() {
+        PageFactory.dashboardPage()
+                .open()
+                .goToBookStoreApplication()
+                .goToLoginPage()
                 .performLogin(randomAccount.getUsername(), randomAccount.getPassword())
                 .checkErrorMsgDisplayed();
     }

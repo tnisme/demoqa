@@ -1,4 +1,4 @@
-package demoqa.utility;
+package demoqa.utilities;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedCondition;

@@ -1,8 +1,8 @@
 package demoqa.factories;
 
 import com.github.javafaker.Faker;
-import demoqa.entity.Account;
-import demoqa.utility.JsonUtility;
+import demoqa.entities.Account;
+import demoqa.utilities.JsonUtility;
 import org.json.JSONObject;
 
 import java.util.Map;

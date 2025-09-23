@@ -1,4 +1,4 @@
-package demoqa.entity;
+package demoqa.entities;
 
 /**
  * Represents a user account with authentication credentials.

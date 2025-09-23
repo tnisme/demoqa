@@ -1,4 +1,4 @@
-package demoqa.page;
+package demoqa.pages;
 
 import demoqa.factories.ElementFactory;
 import demoqa.factories.PageFactory;
