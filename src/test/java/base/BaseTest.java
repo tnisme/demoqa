@@ -109,17 +109,11 @@ public class BaseTest {
             e.printStackTrace();
         }
         try {
-            switch (browser) {
-                case CHROME:
-                    localDriver = new RemoteWebDriver(new URL(jsonObject.getString("hub_url")), new ChromeOptions());
-                    break;
-                case FIREFOX:
-                    localDriver = new RemoteWebDriver(new URL(jsonObject.getString("hub_url")), new FirefoxOptions());
-                    break;
-                case EDGE:
-                default:
-                    throw new IllegalArgumentException("Browser type not supported");
-            }
+            localDriver = switch (browser) {
+                case CHROME -> new RemoteWebDriver(new URL(jsonObject.getString("hub_url")), new ChromeOptions());
+                case FIREFOX -> new RemoteWebDriver(new URL(jsonObject.getString("hub_url")), new FirefoxOptions());
+                default -> throw new IllegalArgumentException("Browser type not supported");
+            };
             DriverManager.setDriver(localDriver);
         } catch (MalformedURLException e) {
             UtilityFactory.reportUtil().log(LogStatus.ERROR, e.toString());
