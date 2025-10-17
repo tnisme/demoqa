@@ -14,10 +14,17 @@ public class DriverManager {
     }
 
     public static WebDriver getDriver() {
+        if (DRIVER.get() == null) {
+            throw new IllegalStateException("WebDriver has not been set for the current thread.");
+        }
         return DRIVER.get();
     }
 
     public static void removeDriver() {
-        DRIVER.remove();
+        WebDriver driver = DRIVER.get();
+        if (driver != null) {
+            driver.quit();
+            DRIVER.remove();
+        }
     }
 }

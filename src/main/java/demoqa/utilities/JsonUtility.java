@@ -1,10 +1,10 @@
 package demoqa.utilities;
 
+import demoqa.exceptions.FailedToReadFileException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 
 public class JsonUtility {
@@ -26,7 +26,7 @@ public class JsonUtility {
             String content = new String(is.readAllBytes(), StandardCharsets.UTF_8);
             return new JSONObject(content);
         } catch (IOException e) {
-            throw new UncheckedIOException("Error reading file: " + path, e);
+            throw new FailedToReadFileException("Error reading file: " + path, e);
         }
     }
 }

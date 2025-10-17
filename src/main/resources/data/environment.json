@@ -1,5 +1,6 @@
 {
   "homeUrl": "https://demoqa.com/",
   "object_wait": 3,
+  "remote": true,
   "hub_url": "http://localhost:4444/wd/hub"
 }

@@ -1,5 +1,6 @@
 package demoqa.pages;
 
+import demoqa.components.Button;
 import demoqa.exceptions.NotOpenDashBoardPageException;
 import demoqa.factories.*;
 import org.openqa.selenium.By;
@@ -30,9 +31,8 @@ public class DashboardPage extends BasePage {
         if (!DriverManager.getDriver().getCurrentUrl().equals(URL)) {
             throw new NotOpenDashBoardPageException("LoginPage is not opened. Call open() before using goToBookStoreApplication().");
         }
-        ElementFactory.button(bookStoreApplication).clickButton();
-        UtilityFactory.waitUtil().waitForPageLoad();
-        return PageFactory.bookStoreApplicationPage();
+        Button.of(bookStoreApplication).clickButton();
+        return PageFactory.create(BookStoreApplicationPage.class);
     }
     // endregion
 }

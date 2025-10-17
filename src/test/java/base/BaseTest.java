@@ -3,14 +3,8 @@ package base;
 import com.relevantcodes.extentreports.LogStatus;
 import demoqa.enums.BrowserType;
 import demoqa.factories.*;
-import demoqa.utilities.ReportUtility;
 import org.apache.commons.io.FileUtils;
-import org.json.JSONObject;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.*;
@@ -18,25 +12,23 @@ import org.testng.annotations.*;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Paths;
 
 public class BaseTest {
     private static final ThreadLocal<String> className = new ThreadLocal<>();
     private final static String USER_DIR = System.getProperty("user.dir");
-    private static final String CONFIG_PATH = Paths.get("src", "main", "resources", "data").toString();
 
     @BeforeTest
     @Parameters("browser")
-    public void setUp(ITestContext ctx, @Optional("CHROME") BrowserType browser) {
+    public void setUp(ITestContext ctx, @Optional("CHROME") BrowserType browserType) {
         cleanReportDirectory();
         className.set(getClass().getSimpleName());
-        UtilityFactory.initReport(ctx.getCurrentXmlTest().getName());
-        UtilityFactory.reportUtil().startTest(className.get());
-        UtilityFactory.reportUtil().log(LogStatus.INFO, "<b>Browser: " + browser + "<b>");
+        UtilityManager.initReport(ctx.getCurrentXmlTest().getName());
+        UtilityManager.reportUtil().startTest(className.get());
+        UtilityManager.reportUtil().log(LogStatus.INFO, "<b>Browser: " + browserType + "<b>");
 
-        initBrowser(browser);
+        WebDriver driver = DriverFactory.createInstance(browserType);
+        DriverManager.setDriver(driver);
+        DriverManager.getDriver().manage().window().maximize();
     }
 
     @BeforeClass
@@ -46,81 +38,34 @@ public class BaseTest {
 
     @BeforeMethod
     public void setUpBeforeMethod(Method method) {
-        UtilityFactory.reportUtil().log(LogStatus.INFO, "<b>Start method: " + method.getName() + "</b>");
+        UtilityManager.reportUtil().log(LogStatus.INFO, "<b>Start method: " + method.getName() + "</b>");
     }
 
     @AfterMethod
-    public void afterMethod(ITestResult result, Method method) throws IOException {
+    public void afterMethod(ITestResult result, Method method) {
         String methodName = method.getName();
         if (result.getStatus() == ITestResult.FAILURE) {
-            UtilityFactory.reportUtil().log(LogStatus.FAIL, "Test case: " + methodName + " failed");
-            UtilityFactory.reportUtil().addScreenCapture(LogStatus.FAIL);
+            UtilityManager.reportUtil().log(LogStatus.FAIL, "Test case: " + methodName + " failed");
+            UtilityManager.reportUtil().addScreenCapture(LogStatus.FAIL);
+            UtilityManager.reportUtil().log(LogStatus.FAIL, String.valueOf(result.getThrowable()));
         } else if (result.getStatus() == ITestResult.SKIP) {
-            UtilityFactory.reportUtil().log(LogStatus.SKIP, "Test case: " + methodName + " skipped");
+            UtilityManager.reportUtil().log(LogStatus.SKIP, "Test case: " + methodName + " skipped");
         } else {
-            UtilityFactory.reportUtil().log(LogStatus.PASS, "Test case: " + methodName + " passed");
+            UtilityManager.reportUtil().log(LogStatus.PASS, "Test case: " + methodName + " passed");
         }
     }
 
     @AfterClass
-    public void afterClass() throws TimeoutException {
-        UtilityFactory.reportUtil().flush();
+    public void afterClass() {
+        UtilityManager.reportUtil().flush();
     }
 
     @AfterTest
     public void tearDown() {
-        if (DriverManager.getDriver() == null) {
-            return;
-        }
-
-        try {
-            // Clear utility
-            UtilityFactory.clear();
-
-            // Clear report
-            ReportUtility report = UtilityFactory.reportUtil();
-            if (report != null) {
-               report.close();
-            }
-
-            // Quit driver
-            try {
-                DriverManager.getDriver().quit();
-            } catch (Exception e) {
-                UtilityFactory.reportUtil().log(LogStatus.ERROR, e.toString());
-                e.printStackTrace();
-            }
-        } finally {
-            // Always remove driver to avoid memory leaks
+        if (DriverManager.getDriver() != null) {
+            UtilityManager.clear();
             DriverManager.removeDriver();
         }
-    }
-
-    private void initBrowser(BrowserType browser) {
-        WebDriver localDriver;
-        JSONObject jsonObject = null;
-        File file = new File(CONFIG_PATH + File.separator + "environment.json");
-        try {
-            String content = FileUtils.readFileToString(file, "utf-8");
-            jsonObject = new JSONObject(content);
-        } catch (IOException e) {
-            UtilityFactory.reportUtil().log(LogStatus.ERROR, e.toString());
-            UtilityFactory.reportUtil().log(LogStatus.ERROR, e.getMessage());
-            e.printStackTrace();
-        }
-        try {
-            localDriver = switch (browser) {
-                case CHROME -> new RemoteWebDriver(new URL(jsonObject.getString("hub_url")), new ChromeOptions());
-                case FIREFOX -> new RemoteWebDriver(new URL(jsonObject.getString("hub_url")), new FirefoxOptions());
-                default -> throw new IllegalArgumentException("Browser type not supported");
-            };
-            DriverManager.setDriver(localDriver);
-        } catch (MalformedURLException e) {
-            UtilityFactory.reportUtil().log(LogStatus.ERROR, e.toString());
-            UtilityFactory.reportUtil().log(LogStatus.ERROR, e.getMessage());
-            throw new RuntimeException("Failed to initialize browser: " + e.getMessage(), e);
-        }
-        DriverManager.getDriver().manage().window().maximize();
     }
 
     protected void preCondition() {

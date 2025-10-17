@@ -1,7 +1,7 @@
 package demoqa.components;
 
 import com.relevantcodes.extentreports.LogStatus;
-import demoqa.factories.UtilityFactory;
+import demoqa.factories.UtilityManager;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -13,6 +13,10 @@ public class Input extends BaseElement {
 
     public Input(By locator) {
         super(locator);
+    }
+
+    public static Input of(By locator) {
+        return new Input(locator);
     }
 
     public Input clearBefore() {
@@ -39,9 +43,9 @@ public class Input extends BaseElement {
         WebElement element = find();
         if (shouldClear) {
             element.clear();
-            UtilityFactory.reportUtil().log(LogStatus.INFO, "Cleared input field" + locator);
+            UtilityManager.reportUtil().log(LogStatus.INFO, "Cleared input field" + locator);
         }
         element.sendKeys(textBuilder.toString());
-        UtilityFactory.reportUtil().log(LogStatus.INFO, "Typed text: " + textBuilder);
+        UtilityManager.reportUtil().log(LogStatus.INFO, "Typed text: " + textBuilder);
     }
 }

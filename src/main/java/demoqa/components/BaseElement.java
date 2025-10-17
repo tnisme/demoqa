@@ -1,6 +1,6 @@
 package demoqa.components;
 
-import demoqa.factories.UtilityFactory;
+import demoqa.factories.UtilityManager;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -8,7 +8,7 @@ import org.openqa.selenium.WebElement;
  * Abstract base class for all web elements in the framework.
  * Provides common functionality and locator-based element interaction.
  */
-public abstract class BaseElement {
+public class BaseElement {
     /**
      * The locator strategy used to find this element
      */
@@ -19,7 +19,7 @@ public abstract class BaseElement {
     }
 
     protected WebElement find() {
-        return UtilityFactory.waitUtil().waitUntilVisibilityOf(locator);
+        return UtilityManager.waitUtil().waitUntilVisibilityOf(locator);
     }
 
     public void click() {
@@ -32,7 +32,7 @@ public abstract class BaseElement {
 
     public boolean isDisplayed(int timeoutInSeconds) {
         try {
-            UtilityFactory.waitUtil().waitUntilVisibilityOf(locator, timeoutInSeconds);
+            UtilityManager.waitUtil().waitUntilVisibilityOf(locator, timeoutInSeconds);
             return true;
         } catch (Exception e) {
             return false;

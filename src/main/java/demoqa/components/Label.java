@@ -8,6 +8,10 @@ public class Label extends BaseElement{
         super(locator);
     }
 
+    public static Label of(By locator) {
+        return new Label(locator);
+    }
+
     public String getText() {
         return find().getText();
     }

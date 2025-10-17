@@ -1,8 +1,9 @@
 package demoqa.pages;
 
-import demoqa.factories.ElementFactory;
+import demoqa.components.Button;
+import demoqa.components.Label;
 import demoqa.factories.PageFactory;
-import demoqa.factories.UtilityFactory;
+import demoqa.factories.UtilityManager;
 import org.openqa.selenium.By;
 
 public class ProfilePage extends BasePage {
@@ -14,13 +15,13 @@ public class ProfilePage extends BasePage {
 
     // region methods
     public ProfilePage checkUsername(String usernameExpected) {
-        UtilityFactory.assertUtil().assertEquals(usernameExpected, ElementFactory.label(username).getText(),"Check username");
+        UtilityManager.assertUtil().assertEquals(usernameExpected, Label.of(username).getText(),"Check username");
         return this;
     }
 
     public LoginPage logout() {
-        ElementFactory.button(logout).clickButton();
-        return PageFactory.loginPage();
+        Button.of(logout).clickButton();
+        return PageFactory.create(LoginPage.class);
     }
     // endregion
 }

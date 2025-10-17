@@ -1,7 +1,7 @@
 package demoqa.components;
 
 import com.relevantcodes.extentreports.LogStatus;
-import demoqa.factories.UtilityFactory;
+import demoqa.factories.UtilityManager;
 import org.openqa.selenium.By;
 
 public class Button extends BaseElement {
@@ -10,9 +10,13 @@ public class Button extends BaseElement {
         super(locator);
     }
 
+    public static Button of(By locator) {
+        return new Button(locator);
+    }
+
     public void clickButton() {
-        UtilityFactory.actionUtil().scrollToElement(find());
+        UtilityManager.actionUtil().scrollToElement(find());
         find().click();
-        UtilityFactory.reportUtil().log(LogStatus.INFO, "Clicked on button: " + locator);
+        UtilityManager.reportUtil().log(LogStatus.INFO, "Clicked on button: " + locator);
     }
 }

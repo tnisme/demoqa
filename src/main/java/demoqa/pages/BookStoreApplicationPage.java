@@ -1,6 +1,6 @@
 package demoqa.pages;
 
-import demoqa.factories.ElementFactory;
+import demoqa.components.Button;
 import demoqa.factories.PageFactory;
 import org.openqa.selenium.By;
 
@@ -12,8 +12,8 @@ public class BookStoreApplicationPage extends BasePage {
 
     // region methods
     public LoginPage goToLoginPage() {
-        ElementFactory.button(login).clickButton();
-        return PageFactory.loginPage();
+        Button.of(login).clickButton();
+        return PageFactory.create(LoginPage.class);
     }
     // endregion
 }

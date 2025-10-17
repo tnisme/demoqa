@@ -1,8 +1,10 @@
 package demoqa.pages;
 
-import demoqa.factories.ElementFactory;
+import demoqa.components.Button;
+import demoqa.components.Input;
+import demoqa.components.Label;
 import demoqa.factories.PageFactory;
-import demoqa.factories.UtilityFactory;
+import demoqa.factories.UtilityManager;
 import org.openqa.selenium.By;
 
 public class LoginPage extends BasePage {
@@ -22,7 +24,7 @@ public class LoginPage extends BasePage {
      * @return the LoginPage object
      */
     public LoginPage fillInUsername(String username) {
-        ElementFactory.input(usernameField).clearBefore().type(username).perform();
+        Input.of(usernameField).clearBefore().type(username).perform();
         return this;
     }
 
@@ -33,7 +35,7 @@ public class LoginPage extends BasePage {
      * @return the LoginPage object
      */
     public LoginPage fillInPassword(String password) {
-        ElementFactory.input(passwordField).clearBefore().type(password).perform();
+        Input.of(passwordField).clearBefore().type(password).perform();
         return this;
     }
 
@@ -43,7 +45,7 @@ public class LoginPage extends BasePage {
      * @return the LoginPage object
      */
     public LoginPage clickLogin() {
-        ElementFactory.button(loginButton).clickButton();
+        Button.of(loginButton).clickButton();
         return this;
     }
 
@@ -68,7 +70,7 @@ public class LoginPage extends BasePage {
      */
     public ProfilePage login(String username, String password) {
         performLogin(username, password);
-        return PageFactory.profilePage();
+        return PageFactory.create(ProfilePage.class);
     }
 
     /**
@@ -77,7 +79,7 @@ public class LoginPage extends BasePage {
      * @return the LoginPage object
      */
     public LoginPage checkErrorMsgDisplayed() {
-        UtilityFactory.assertUtil().assertTrue(isErrorMsgDisplayed(), "Check error message");
+        UtilityManager.assertUtil().assertTrue(isErrorMsgDisplayed(), "Check error message");
         return this;
     }
 
@@ -87,7 +89,7 @@ public class LoginPage extends BasePage {
      * @return true if the error message is displayed, false otherwise
      */
     private boolean isErrorMsgDisplayed() {
-        return ElementFactory.label(errorMsg).isDisplayed(5);
+        return Label.of(errorMsg).isDisplayed(5);
     }
     // endregion
 }

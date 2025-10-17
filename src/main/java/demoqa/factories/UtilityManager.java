@@ -14,9 +14,9 @@ import java.util.function.Supplier;
  * Centralized factory for managing utility instances.
  * Uses ThreadLocal to ensure thread safety in parallel test execution.
  */
-public class UtilityFactory {
+public class UtilityManager {
 
-    private UtilityFactory() {
+    private UtilityManager() {
         // private constructor to prevent instantiation
     }
 
@@ -71,7 +71,11 @@ public class UtilityFactory {
      * @return The ReportUtility instance for the current thread
      */
     public static ReportUtility reportUtil() {
-        return (ReportUtility) UTILITIES.get().get(ReportUtility.class);
+        ReportUtility reportUtility = (ReportUtility) UTILITIES.get().get(ReportUtility.class);
+        if (reportUtility == null) {
+            throw new IllegalStateException("ReportUtility not initialized. Call initReport() first.");
+        }
+        return reportUtility;
     }
 
     /**
